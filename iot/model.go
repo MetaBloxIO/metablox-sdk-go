@@ -1,30 +1,24 @@
 package iot
 
+import (
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"log"
+)
+
 // Device lifecycle changes: device online, device offline, device deleted, device renamed, device binding, device unbinding, device information changes, disable, enable.
 // Historical data reporting of physical model: historical data reported by devices for attributes, events, and services.
 // Firmware upgrade status notification: firmware upgrade status reported by devices.
 // Device message reporting: real-time data reported by devices for attributes, events, and services.
 // Device status change notification: real-time data reported by devices for attributes, events, and services.
 
-var eventMap = map[string]interface{}{
-	"online":  nil,
-	"offline": nil,
-	"bind":    nil,
-	"unbind":  nil,
-	"disable": nil,
-	"enable":  nil,
-}
-
-var actionMap = map[string]interface{}{
-	"heartbeat": nil,
-	"settings":  nil,
-	"workload":  nil,
-	"guest":     nil,
+var defaultMessageHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	log.Printf("TOPIC: %s\n", msg.Topic())
+	log.Printf("MSG: %s\n", string(msg.Payload()))
 }
 
 type MinerWorkloadData struct {
-	Identity *Identity `json:"identity" v:"required"`
-	Qos      *Qos      `json:"qos" v:"required"`
+	Identity *Identity `json:"identity" v:"required" binding:"required"`
+	Qos      *Qos      `json:"qos" v:"required" binding:"required"`
 	Tracks   string    `json:"tracks"`
 	Sn       string    `json:"sn"`
 }

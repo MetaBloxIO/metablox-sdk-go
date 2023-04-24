@@ -6,25 +6,23 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
-	"time"
 )
 
 // MqttConfig  MQTT Config
 type MqttConfig struct {
-	Broker         string                     `json:"broker"`
-	ClientId       string                     `json:"clientId"`
-	Username       string                     `json:"username"`
-	Password       string                     `json:"password"`
-	CertFilePath   string                     `json:"certFilePath"`
-	CertPrivateKey string                     `json:"certPrivateKey"`
-	WillEnabled    bool                       `json:"willEnabled"`
-	WillTopic      string                     `json:"willTopic"`
-	WillPayload    string                     `json:"willPayload"`
-	WillQos        byte                       `json:"willQos"`
-	Qos            byte                       `json:"qos"`
-	Retained       bool                       `json:"retained"`
-	onConnect      mqtt.OnConnectHandler      `json:"onConnect"`
-	connectionLost mqtt.ConnectionLostHandler `json:"connectionLost"`
+	Broker                string `json:"broker"`
+	ClientId              string `json:"clientId"` //SN
+	Username              string `json:"username"` //did (optional)
+	Password              string `json:"password"`
+	CertFile              string `json:"certFile"`
+	CertPrivateKey        string `json:"certPrivateKey"`
+	WillEnabled           bool   `json:"willEnabled"`
+	WillPayload           string `json:"willPayload"`
+	WillQos               byte   `json:"willQos"`
+	Qos                   byte   `json:"qos"`
+	Retained              bool   `json:"retained"`
+	ConnectionLostHandler mqtt.ConnectionLostHandler
+	OnConnectHandler      mqtt.OnConnectHandler
 }
 
 // MqttClient MQTT Client
@@ -35,35 +33,68 @@ type MqttClient struct {
 	topics   map[string]mqtt.MessageHandler
 }
 
+func (mc *MqttClient) SubscribeDefault(handler ...mqtt.MessageHandler) error {
+	if !mc.Client.IsConnected() {
+		return errors.New("mqtt client is not connected")
+	}
+	opt := mc.Client.OptionsReader()
+	defaultSubTopics := []TopicType{
+		SysHeartbeatUpdateReply,
+		SysSettingsUpdate,
+		BizWorkloadValidateReply,
+		OtaFirmwareUpgrade,
+	}
+	var defaultHandler mqtt.MessageHandler
+	if len(handler) > 0 {
+		defaultHandler = handler[0]
+	} else {
+		defaultHandler = defaultMessageHandler
+	}
+
+	for _, topicType := range defaultSubTopics {
+		topic := topicType.Topic(ProductKey, opt.ClientID())
+		if err := mc.Subscribe(topic, defaultHandler); err != nil {
+			return err
+		}
+		mc.topics[topic] = defaultHandler
+	}
+	return nil
+}
+
 func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 	var c MqttClient
+
+	if cfg.OnConnectHandler == nil {
+		cfg.OnConnectHandler = func(client mqtt.Client) {
+			log.Println("mqtt client connected")
+		}
+	}
+	if cfg.ConnectionLostHandler == nil {
+		cfg.ConnectionLostHandler = func(client mqtt.Client, err error) {
+			log.Println("mqtt client disconnected", err)
+		}
+	}
+
 	opts := mqtt.NewClientOptions().
 		AddBroker(cfg.Broker).
 		SetClientID(cfg.ClientId).
-		SetMaxReconnectInterval(time.Second * 5)
+		SetUsername(cfg.Username).
+		SetPassword(cfg.Password).
+		SetOnConnectHandler(cfg.OnConnectHandler).
+		SetConnectionLostHandler(cfg.ConnectionLostHandler)
+
 	//Determine whether to set up a will
 	if cfg.WillEnabled {
-		opts.SetWill(cfg.WillTopic, cfg.WillPayload, cfg.WillQos, cfg.Retained)
+		opts.SetWill(SysWillStatus.Topic(ProductKey, cfg.ClientId), cfg.WillPayload, cfg.WillQos, cfg.Retained)
 	}
 	//Determine whether to set up a certificate
-	if cfg.CertFilePath != "" {
-		tlsConfig, err := newTLSConfig(cfg.CertFilePath, cfg.CertPrivateKey)
+	if cfg.CertFile != "" {
+		tlsConfig, err := NewTLSConfig(cfg.CertFile, cfg.CertPrivateKey)
 		if err != nil {
 			return nil, err
 		}
 		opts.SetTLSConfig(tlsConfig)
-	} else {
-		opts.SetUsername(cfg.Username).SetPassword(cfg.Password)
 	}
-
-	if cfg.onConnect == nil {
-		cfg.onConnect = func(c mqtt.Client) {}
-	}
-	if cfg.connectionLost == nil {
-		cfg.connectionLost = func(c mqtt.Client, err error) {}
-	}
-	opts.SetOnConnectHandler(c.OnConnectHandler(cfg.onConnect)).
-		SetConnectionLostHandler(c.ConnectionLostHandler(cfg.connectionLost))
 	c.Client = mqtt.NewClient(opts)
 	c.qos = cfg.Qos
 	c.retained = cfg.Retained
@@ -111,24 +142,17 @@ func (mc *MqttClient) Close() {
 	mc.Client.Disconnect(250) //Millisecond
 }
 
-func (mc *MqttClient) OnConnectHandler(handler mqtt.OnConnectHandler) mqtt.OnConnectHandler {
-	return func(c mqtt.Client) {
-		for topic, onMessage := range mc.topics {
-			mc.Client.Subscribe(topic, mc.qos, onMessage)
-		}
-		handler(c)
-	}
+func (mc *MqttClient) PublishWrapped(topicType TopicType, data interface{}) (string, error) {
+	return PublishWrapped(mc, topicType, data)
 }
 
-func (mc *MqttClient) ConnectionLostHandler(handler mqtt.ConnectionLostHandler) mqtt.ConnectionLostHandler {
-	return func(c mqtt.Client, e error) {
-		handler(c, e)
-	}
+func (mc *MqttClient) SubscribeWrapped(topicType TopicType, handler func(res *MessageRes[interface{}], err error)) (err error) {
+	return SubscribeWrapped[interface{}](mc, topicType, handler)
 }
 
-// newTLSConfig  new TLS Config
-func newTLSConfig(certFile string, privateKey string) (*tls.Config, error) {
-	cert, err := tls.LoadX509KeyPair(certFile, privateKey)
+// NewTLSConfig New TLS Config
+func NewTLSConfig(certFile string, certPrivateKey string) (*tls.Config, error) {
+	cert, err := tls.LoadX509KeyPair(certFile, certPrivateKey)
 	if err != nil {
 		return nil, err
 	}
