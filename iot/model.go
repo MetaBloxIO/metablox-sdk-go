@@ -22,7 +22,7 @@ var actionMap = map[string]interface{}{
 	"guest":     nil,
 }
 
-type WorkloadData struct {
+type MinerWorkloadData struct {
 	Identity *Identity `json:"identity" v:"required"`
 	Qos      *Qos      `json:"qos" v:"required"`
 	Tracks   string    `json:"tracks"`
@@ -45,7 +45,7 @@ type MinerGuestData struct {
 	LanguageCode  string `json:"languageCode"  description:"Language code"`
 }
 
-type SettingsData struct {
+type MinerSettingsData struct {
 	CreatedAt    int64  `json:"createdAt"`
 	UpdatedAt    int64  `json:"updatedAt"`
 	Banner       string `json:"banner"`
@@ -55,7 +55,7 @@ type SettingsData struct {
 	DownloadRate int    `json:"downloadRate"`
 }
 
-type HeartbeatData struct {
+type MinerHeartbeatData struct {
 	Sn            string       `json:"sn" binding:"required" v:"required"`
 	Did           string       `json:"did" binding:"required" v:"required"`
 	WalletAddress string       `json:"walletAddress" binding:"required" v:"required"`
