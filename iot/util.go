@@ -17,15 +17,29 @@ func PublishData(mc *MqttClient, topic string, data interface{}) (msgId string, 
 	return req.Id, mc.Publish(topic, jb)
 }
 
-func SubscribeData[T any](mc *MqttClient, topic string, handler func(res *Message[T], err error)) (err error) {
+func SubscribeData(mc *MqttClient, topic string, handler func(res *Message, err error)) (err error) {
 
 	onMessage := func(client mqtt.Client, message mqtt.Message) {
-		msg := &Message[T]{}
+
+		msg := &Message{}
+		split := strings.Split(message.Topic(), "/")
+		var productKey = ""
+		var clientId = ""
+		if (strings.HasPrefix(message.Topic(), Sys) ||
+			strings.HasPrefix(message.Topic(), Biz) ||
+			strings.HasPrefix(message.Topic(), Ota) ||
+			strings.HasPrefix(message.Topic(), Ext)) && len(split) >= 3 {
+			productKey = split[1]
+			clientId = split[2]
+		}
+
 		if err = json.Unmarshal(message.Payload(), &msg); err != nil {
-			handler(&Message[T]{rawMsg: message}, err)
+			handler(&Message{rawMsg: message, productKey: productKey, clientId: clientId}, err)
 			return
 		}
 		msg.rawMsg = message
+		msg.productKey = productKey
+		msg.clientId = clientId
 		handler(msg, nil)
 	}
 

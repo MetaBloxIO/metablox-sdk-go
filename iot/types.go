@@ -7,11 +7,21 @@ import (
 )
 
 type Message struct {
-	rawMsg  mqtt.Message
-	Id      string      `json:"id"`
-	Ts      int64       `json:"ts"`
-	Data    interface{} `json:"data"`
-	Version string      `json:"version"`
+	rawMsg     mqtt.Message
+	productKey string
+	clientId   string
+	Id         string      `json:"id"`
+	Ts         int64       `json:"ts"`
+	Data       interface{} `json:"data"`
+	Version    string      `json:"version"`
+}
+
+func (m Message) ProductKey() string {
+	return m.productKey
+}
+
+func (m Message) ClientId() string {
+	return m.clientId
 }
 
 func (m Message) RawMessage() mqtt.Message {

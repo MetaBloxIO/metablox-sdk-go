@@ -3,7 +3,7 @@ package iot
 import "fmt"
 
 const ProductKey = "miner" // Temporarily fixed as “miner”
-const DeviceKey = "${clientid}"
+const ClientId = "${clientid}"
 
 const SLW = "+" // single level wildcard
 const MLW = "#" // multi level wildcard
@@ -20,8 +20,8 @@ const Broadcast = "/broadcast"
 
 type TopicType string
 
-func (t TopicType) Topic(productKey, deviceKey string) string {
-	return fmt.Sprintf(string(t), productKey, deviceKey)
+func (t TopicType) Topic(productKey, clientId string) string {
+	return fmt.Sprintf(string(t), productKey, clientId)
 }
 
 const (

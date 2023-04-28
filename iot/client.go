@@ -151,16 +151,16 @@ func (mc *MqttClient) PublishData(topicType TopicType, data interface{}) (string
 	return PublishData(mc, topicType.Topic(ProductKey, mc.ClientId()), data)
 }
 
-func (mc *MqttClient) PublishDataTo(topicType TopicType, deviceKey string, data interface{}) (string, error) {
-	return PublishData(mc, topicType.Topic(ProductKey, deviceKey), data)
+func (mc *MqttClient) PublishDataTo(topicType TopicType, clientId string, data interface{}) (string, error) {
+	return PublishData(mc, topicType.Topic(ProductKey, clientId), data)
 }
 
 func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *Message, err error)) (err error) {
-	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, mc.ClientId()), handler)
+	return SubscribeData(mc, topicType.Topic(ProductKey, mc.ClientId()), handler)
 }
 
-func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, deviceKey string, handler func(res *Message, err error)) (err error) {
-	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, deviceKey), handler)
+func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, clientId string, handler func(res *Message, err error)) (err error) {
+	return SubscribeData(mc, topicType.Topic(ProductKey, clientId), handler)
 }
 
 // NewTLSConfig New TLS Config
