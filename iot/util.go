@@ -8,27 +8,25 @@ import (
 	"strings"
 )
 
-func PublishData(mc *MqttClient, bizType TopicType, data interface{}) (msgId string, err error) {
-	req := NewMessageReq(data)
+func PublishData(mc *MqttClient, topic string, data interface{}) (msgId string, err error) {
+	req := NewMessage(data)
 	jb, err := json.Marshal(req)
 	if err != nil {
 		return "", err
 	}
-	opt := mc.Client.OptionsReader()
-	return req.Id, mc.Publish(bizType.Topic(ProductKey, opt.ClientID()), jb)
+	return req.Id, mc.Publish(topic, jb)
 }
 
-func SubscribeData[T any](mc *MqttClient, topicType TopicType, handler func(res *MessageRes[T], err error)) (err error) {
-	opt := mc.Client.OptionsReader()
-	topic := topicType.Topic(ProductKey, opt.ClientID())
+func SubscribeData[T any](mc *MqttClient, topic string, handler func(res *Message[T], err error)) (err error) {
 
 	onMessage := func(client mqtt.Client, message mqtt.Message) {
-		res := &MessageRes[T]{}
-		if err = json.Unmarshal(message.Payload(), &res); err != nil {
-			handler(nil, err)
+		msg := &Message[T]{}
+		if err = json.Unmarshal(message.Payload(), &msg); err != nil {
+			handler(&Message[T]{rawMsg: message}, err)
 			return
 		}
-		handler(res, nil)
+		msg.rawMsg = message
+		handler(msg, nil)
 	}
 
 	if tc := mc.Client.Subscribe(topic, mc.qos, onMessage); tc.Wait() && tc.Error() != nil {

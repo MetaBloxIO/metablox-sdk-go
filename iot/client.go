@@ -33,6 +33,11 @@ type MqttClient struct {
 	topics   map[string]mqtt.MessageHandler
 }
 
+func (mc *MqttClient) ClientId() string {
+	reader := mc.Client.OptionsReader()
+	return reader.ClientID()
+}
+
 func (mc *MqttClient) SubscribeDefault(handler ...mqtt.MessageHandler) error {
 	if !mc.Client.IsConnected() {
 		return errors.New("mqtt client is not connected")
@@ -143,11 +148,19 @@ func (mc *MqttClient) Close() {
 }
 
 func (mc *MqttClient) PublishData(topicType TopicType, data interface{}) (string, error) {
-	return PublishData(mc, topicType, data)
+	return PublishData(mc, topicType.Topic(ProductKey, mc.ClientId()), data)
 }
 
-func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *MessageRes[interface{}], err error)) (err error) {
-	return SubscribeData[interface{}](mc, topicType, handler)
+func (mc *MqttClient) PublishDataTo(topicType TopicType, deviceKey string, data interface{}) (string, error) {
+	return PublishData(mc, topicType.Topic(ProductKey, deviceKey), data)
+}
+
+func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *Message[interface{}], err error)) (err error) {
+	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, mc.ClientId()), handler)
+}
+
+func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, deviceKey string, handler func(res *Message[interface{}], err error)) (err error) {
+	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, deviceKey), handler)
 }
 
 // NewTLSConfig New TLS Config

@@ -1,41 +1,37 @@
 package iot
 
 import (
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/google/uuid"
 	"time"
 )
 
-type MessageReq[T any] struct {
+type Message[T any] struct {
+	rawMsg  mqtt.Message
 	Id      string `json:"id"`
 	Ts      int64  `json:"ts"`
-	Params  T      `json:"params"`
+	Data    T      `json:"data"`
 	Version string `json:"version"`
-	Timeout int64  `json:"timeout"`
 }
 
-func NewMessageReq[T any](params T) *MessageReq[T] {
-	return &MessageReq[T]{
+func (m Message[T]) RawMessage() mqtt.Message {
+	return m.rawMsg
+}
+
+func NewMessage[T any](data T) *Message[T] {
+	return &Message[T]{
 		Id:      uuid.NewString(),
 		Ts:      time.Now().UnixMilli(),
-		Params:  params,
+		Data:    data,
 		Version: Version,
 	}
 }
 
-type MessageRes[T any] struct {
-	Id   string `json:"id"`
-	Ts   int64  `json:"ts"`
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-	Data T      `json:"data"`
-}
-
-func NewMessageRes[T any](id string, code int, msg string, data T) *MessageRes[T] {
-	return &MessageRes[T]{
-		Id:   id,
-		Ts:   time.Now().UnixMilli(),
-		Code: code,
-		Msg:  msg,
-		Data: data,
+func NewMessageWithId[T any](msgId string, data T) *Message[T] {
+	return &Message[T]{
+		Id:      msgId,
+		Ts:      time.Now().UnixMilli(),
+		Data:    data,
+		Version: Version,
 	}
 }
