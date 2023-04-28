@@ -155,11 +155,11 @@ func (mc *MqttClient) PublishDataTo(topicType TopicType, deviceKey string, data 
 	return PublishData(mc, topicType.Topic(ProductKey, deviceKey), data)
 }
 
-func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *Message[interface{}], err error)) (err error) {
+func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *Message, err error)) (err error) {
 	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, mc.ClientId()), handler)
 }
 
-func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, deviceKey string, handler func(res *Message[interface{}], err error)) (err error) {
+func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, deviceKey string, handler func(res *Message, err error)) (err error) {
 	return SubscribeData[interface{}](mc, topicType.Topic(ProductKey, deviceKey), handler)
 }
 
