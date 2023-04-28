@@ -142,12 +142,12 @@ func (mc *MqttClient) Close() {
 	mc.Client.Disconnect(250) //Millisecond
 }
 
-func (mc *MqttClient) PublishWrapped(topicType TopicType, data interface{}) (string, error) {
-	return PublishWrapped(mc, topicType, data)
+func (mc *MqttClient) PublishData(topicType TopicType, data interface{}) (string, error) {
+	return PublishData(mc, topicType, data)
 }
 
-func (mc *MqttClient) SubscribeWrapped(topicType TopicType, handler func(res *MessageRes[interface{}], err error)) (err error) {
-	return SubscribeWrapped[interface{}](mc, topicType, handler)
+func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *MessageRes[interface{}], err error)) (err error) {
+	return SubscribeData[interface{}](mc, topicType, handler)
 }
 
 // NewTLSConfig New TLS Config

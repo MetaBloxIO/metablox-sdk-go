@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func PublishWrapped(mc *MqttClient, bizType TopicType, data interface{}) (msgId string, err error) {
+func PublishData(mc *MqttClient, bizType TopicType, data interface{}) (msgId string, err error) {
 	req := NewMessageReq(data)
 	jb, err := json.Marshal(req)
 	if err != nil {
@@ -18,7 +18,7 @@ func PublishWrapped(mc *MqttClient, bizType TopicType, data interface{}) (msgId 
 	return req.Id, mc.Publish(bizType.Topic(ProductKey, opt.ClientID()), jb)
 }
 
-func SubscribeWrapped[T any](mc *MqttClient, topicType TopicType, handler func(res *MessageRes[T], err error)) (err error) {
+func SubscribeData[T any](mc *MqttClient, topicType TopicType, handler func(res *MessageRes[T], err error)) (err error) {
 	opt := mc.Client.OptionsReader()
 	topic := topicType.Topic(ProductKey, opt.ClientID())
 
