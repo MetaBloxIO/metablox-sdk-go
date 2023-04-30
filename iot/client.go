@@ -151,7 +151,7 @@ func (mc *MqttClient) PublishData(topicType TopicType, data interface{}) (string
 	return PublishData(mc, topicType.Topic(ProductKey, mc.ClientId()), data)
 }
 
-func (mc *MqttClient) PublishDataTo(topicType TopicType, clientId string, data interface{}) (string, error) {
+func (mc *MqttClient) PublishDataTo(clientId string, topicType TopicType, data interface{}) (string, error) {
 	return PublishData(mc, topicType.Topic(ProductKey, clientId), data)
 }
 
@@ -159,7 +159,7 @@ func (mc *MqttClient) SubscribeData(topicType TopicType, handler func(res *Messa
 	return SubscribeData(mc, topicType.Topic(ProductKey, mc.ClientId()), handler)
 }
 
-func (mc *MqttClient) SubscribeDataFrom(topicType TopicType, clientId string, handler func(res *Message, err error)) (err error) {
+func (mc *MqttClient) SubscribeDataFrom(clientId string, topicType TopicType, handler func(res *Message, err error)) (err error) {
 	return SubscribeData(mc, topicType.Topic(ProductKey, clientId), handler)
 }
 
