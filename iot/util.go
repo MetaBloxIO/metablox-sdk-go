@@ -28,9 +28,9 @@ func SubscribeData(mc *MqttClient, topic string, handler func(res *Message, err 
 		if (strings.HasPrefix(message.Topic(), Sys) ||
 			strings.HasPrefix(message.Topic(), Biz) ||
 			strings.HasPrefix(message.Topic(), Ota) ||
-			strings.HasPrefix(message.Topic(), Ext)) && len(split) >= 3 {
-			productKey = split[1]
-			clientId = split[2]
+			strings.HasPrefix(message.Topic(), Ext)) && len(split) == 6 {
+			productKey = split[2]
+			clientId = split[3]
 		}
 
 		if err = json.Unmarshal(message.Payload(), &msg); err != nil {

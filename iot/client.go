@@ -86,7 +86,8 @@ func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 		SetUsername(cfg.Username).
 		SetPassword(cfg.Password).
 		SetOnConnectHandler(cfg.OnConnectHandler).
-		SetConnectionLostHandler(cfg.ConnectionLostHandler)
+		SetConnectionLostHandler(cfg.ConnectionLostHandler).
+		SetProtocolVersion(5)
 
 	//Determine whether to set up a will
 	if cfg.WillEnabled {
