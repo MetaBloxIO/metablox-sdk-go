@@ -38,32 +38,19 @@ func (mc *MqttClient) ClientId() string {
 	return reader.ClientID()
 }
 
-func (mc *MqttClient) SubscribeDefault(handler ...mqtt.MessageHandler) error {
-	if !mc.Client.IsConnected() {
-		return errors.New("mqtt client is not connected")
-	}
-	opt := mc.Client.OptionsReader()
-	defaultSubTopics := []TopicType{
-		SysHeartbeatUpdateReply,
-		SysSettingsUpdate,
-		BizWorkloadValidateReply,
-		OtaFirmwareUpgrade,
-	}
-	var defaultHandler mqtt.MessageHandler
-	if len(handler) > 0 {
-		defaultHandler = handler[0]
-	} else {
-		defaultHandler = defaultMessageHandler
-	}
-
-	for _, topicType := range defaultSubTopics {
-		topic := topicType.Topic(ProductKey, opt.ClientID())
-		if err := mc.Subscribe(topic, defaultHandler); err != nil {
-			return err
+func (mc *MqttClient) onConnectHandler(handler mqtt.OnConnectHandler) mqtt.OnConnectHandler {
+	return func(c mqtt.Client) {
+		for topic, onMessage := range mc.topics {
+			mc.Client.Subscribe(topic, mc.qos, onMessage)
 		}
-		mc.topics[topic] = defaultHandler
+		handler(c)
 	}
-	return nil
+}
+
+func (mc *MqttClient) connectionLostHandler(handler mqtt.ConnectionLostHandler) mqtt.ConnectionLostHandler {
+	return func(c mqtt.Client, e error) {
+		handler(c, e)
+	}
 }
 
 func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
@@ -85,9 +72,8 @@ func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 		SetClientID(cfg.ClientId).
 		SetUsername(cfg.Username).
 		SetPassword(cfg.Password).
-		SetOnConnectHandler(cfg.OnConnectHandler).
-		SetConnectionLostHandler(cfg.ConnectionLostHandler).
-		SetProtocolVersion(5)
+		SetOnConnectHandler(c.onConnectHandler(cfg.OnConnectHandler)).
+		SetConnectionLostHandler(c.connectionLostHandler(cfg.ConnectionLostHandler))
 
 	//Determine whether to set up a will
 	if cfg.WillEnabled {
@@ -102,6 +88,7 @@ func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 		opts.SetTLSConfig(tlsConfig)
 	}
 	c.Client = mqtt.NewClient(opts)
+
 	c.qos = cfg.Qos
 	c.retained = cfg.Retained
 	c.topics = make(map[string]mqtt.MessageHandler)
