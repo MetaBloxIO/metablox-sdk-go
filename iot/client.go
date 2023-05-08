@@ -6,6 +6,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"time"
 )
 
 // MqttConfig  MQTT Config
@@ -72,6 +73,7 @@ func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 		SetClientID(cfg.ClientId).
 		SetUsername(cfg.Username).
 		SetPassword(cfg.Password).
+		SetMaxReconnectInterval(24 * 365 * time.Hour).
 		SetOnConnectHandler(c.onConnectHandler(cfg.OnConnectHandler)).
 		SetConnectionLostHandler(c.connectionLostHandler(cfg.ConnectionLostHandler))
 
