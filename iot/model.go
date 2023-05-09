@@ -20,7 +20,6 @@ type MinerWorkloadData struct {
 	Identity *Identity `json:"identity" v:"required" binding:"required"`
 	Qos      *Qos      `json:"qos" v:"required" binding:"required"`
 	Tracks   string    `json:"tracks"`
-	Sn       string    `json:"sn"`
 }
 
 // MinerGuestData is the golang structure for table miner_guest_record.
