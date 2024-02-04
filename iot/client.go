@@ -4,9 +4,10 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
 	"time"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // MqttConfig  MQTT Config
@@ -103,7 +104,7 @@ func NewMqttClient(cfg MqttConfig) (*MqttClient, error) {
 
 // Publish  Mqtt message.
 func (mc *MqttClient) Publish(topic string, payload []byte) error {
-	if mc != nil && mc.Client.IsConnected() {
+	if mc != nil && mc.Client.IsConnectionOpen() {
 		if tc := mc.Client.Publish(topic, mc.qos, mc.retained, payload); tc.Wait() && tc.Error() != nil {
 			return tc.Error()
 		}

@@ -1,8 +1,9 @@
 package iot
 
 import (
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Device lifecycle changes: device online, device offline, device deleted, device renamed, device binding, device unbinding, device information changes, disable, enable.
@@ -55,6 +56,35 @@ type MinerHeartbeatData struct {
 	RadioStatus   []WiFiStatus `json:"radioStatus" binding:"required"`
 	SystemStatus  SystemInfo   `json:"systemStatus" binding:"required"`
 	DeviceStatus  DeviceInfo   `json:"deviceStatus" binding:"required"`
+}
+
+type OtaFirmwareUpgradeData struct {
+	Id           int    `json:"id" binding:"required" v:"required"`
+	Distribution string `json:"distribution" binding:"required" v:"required"`
+	Version      string `json:"version" binding:"required" v:"required"`
+	Target       string `json:"target" binding:"required" v:"required"`
+	Description  string `json:"description" binding:"required" v:"required"`
+	ImageUrl     string `json:"imageUrl" binding:"required" v:"required"`
+	IsForced     bool   `json:"isForced" binding:"required" v:"required"`
+	Sha256       string `json:"sha256" binding:"required" v:"required"`
+	Model        string `json:"model" binding:"required" v:"required"`
+	BoardName    string `json:"boardName" binding:"required" v:"required"`
+	ImageData    []byte `json:"imageData" binding:"required" v:"required"`
+}
+
+type OtaFirmwareUpgradeReplyData struct {
+	UpgradeId int    `json:"upgradeId" binding:"required" v:"required"`
+	Message   string `json:"result" binding:"required" v:"required"`
+	Success   bool   `json:"success" binding:"required" v:"required"`
+}
+
+type OtaFirmwareCheckData struct {
+	Distribution string `json:"distribution" binding:"required" v:"required"`
+	Version      string `json:"version" binding:"required" v:"required"`
+	Target       string `json:"target" binding:"required" v:"required"`
+	Description  string `json:"description" binding:"required" v:"required"`
+	Model        string `json:"model" binding:"required" v:"required"`
+	BoardName    string `json:"boardName" binding:"required" v:"required"`
 }
 
 // =================================================================================
@@ -133,6 +163,8 @@ type WifiClientInfo struct {
 	Inactive      int    `json:"inactive"`
 	ConnectedTime int    `json:"connected_time"`
 }
+
+// =================================================================================
 
 type Qos struct {
 	Bandwidth  string `json:"bandwidth"`

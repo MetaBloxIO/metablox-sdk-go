@@ -36,6 +36,7 @@ const (
 	BizWorkloadValidate      TopicType = Biz + "/%s/%s/workload/validate" // client Pub
 	BizWorkloadValidateReply TopicType = BizWorkloadValidate + _REPLY     // client Sub
 
-	OtaFirmwareCheck   TopicType = Ota + "/%s/%s/firmware/check"   // client Pub
-	OtaFirmwareUpgrade TopicType = Ota + "/%s/%s/firmware/upgrade" // client Sub
+	OtaFirmwareCheck        TopicType = Ota + "/%s/%s/firmware/check"   // client Pub
+	OtaFirmwareUpgrade      TopicType = Ota + "/%s/%s/firmware/upgrade" // client Sub
+	OtaFirmwareUpgradeReply TopicType = OtaFirmwareUpgrade + _REPLY     // client Pub
 )
