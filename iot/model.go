@@ -69,12 +69,11 @@ type OtaFirmwareUpgradeData struct {
 	Sha256       string `json:"sha256" binding:"required" v:"required"`
 	Model        string `json:"model" binding:"required" v:"required"`
 	BoardName    string `json:"boardName" binding:"required" v:"required"`
-	ImageData    []byte `json:"imageData" binding:"required" v:"required"`
 }
 
 type OtaFirmwareUpgradeReplyData struct {
 	UpgradeId int    `json:"upgradeId" binding:"required" v:"required"`
-	Message   string `json:"result" binding:"required" v:"required"`
+	Message   string `json:"message" binding:"required" v:"required"`
 	Success   bool   `json:"success" binding:"required" v:"required"`
 }
 
@@ -85,6 +84,7 @@ type OtaFirmwareCheckData struct {
 	Description  string `json:"description" binding:"required" v:"required"`
 	Model        string `json:"model" binding:"required" v:"required"`
 	BoardName    string `json:"boardName" binding:"required" v:"required"`
+	Sn           string `json:"sn" binding:"required" v:"required"`
 }
 
 // =================================================================================
