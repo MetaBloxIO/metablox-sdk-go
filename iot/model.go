@@ -57,6 +57,7 @@ type SettingsData struct {
 
 type HeartbeatData struct {
 	Sn            string       `json:"sn" binding:"required" v:"required"`
+	Mac           string       `json:"mac" binding:"required" v:"required"`
 	Did           string       `json:"did" binding:"required" v:"required"`
 	WalletAddress string       `json:"walletAddress" binding:"required" v:"required"`
 	RadioStatus   []WiFiStatus `json:"radioStatus" binding:"required"`
