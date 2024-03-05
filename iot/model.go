@@ -49,6 +49,18 @@ type MinerSettingsData struct {
 	DownloadRate int    `json:"downloadRate"`
 }
 
+type SystemCommandData struct {
+	Id      int      `json:"id" binding:"required" v:"required"`
+	BinName string   `json:"binName" binding:"required" v:"required"`
+	Args    []string `json:"args" binding:"required" v:"required"`
+}
+
+type SystemCommandReplyData struct {
+	Id      int    `json:"id" binding:"required" v:"required"`
+	Output  string `json:"output" binding:"required" v:"required"`
+	Success bool   `json:"success" binding:"required" v:"required"`
+}
+
 type MinerHeartbeatData struct {
 	Sn            string       `json:"sn" binding:"required" v:"required"`
 	Did           string       `json:"did" binding:"required" v:"required"`

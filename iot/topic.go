@@ -33,6 +33,9 @@ const (
 	SysSettingsGet    TopicType = Sys + "/%s/%s/settings/get"    // client Pub
 	SysSettingsUpdate TopicType = Sys + "/%s/%s/settings/update" // client Sub
 
+	SysCommand      TopicType = Sys + "/%s/%s/command" // client Sub
+	SysCommandReply TopicType = SysCommand + _REPLY    // client Pub
+
 	BizWorkloadValidate      TopicType = Biz + "/%s/%s/workload/validate" // client Pub
 	BizWorkloadValidateReply TopicType = BizWorkloadValidate + _REPLY     // client Sub
 
