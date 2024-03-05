@@ -49,9 +49,22 @@ type MinerSettingsData struct {
 	DownloadRate int    `json:"downloadRate"`
 }
 
+type SystemCommandData struct {
+	Id      int      `json:"id" binding:"required" v:"required"`
+	BinName string   `json:"binName" binding:"required" v:"required"`
+	Args    []string `json:"args" binding:"required" v:"required"`
+}
+
+type SystemCommandReplyData struct {
+	Id      int    `json:"id" binding:"required" v:"required"`
+	Output  string `json:"output" binding:"required" v:"required"`
+	Success bool   `json:"success" binding:"required" v:"required"`
+}
+
 type MinerHeartbeatData struct {
 	Sn            string       `json:"sn" binding:"required" v:"required"`
 	Did           string       `json:"did" binding:"required" v:"required"`
+	Mac           string       `json:"mac" binding:"required" v:"required"`
 	WalletAddress string       `json:"walletAddress" `
 	RadioStatus   []WiFiStatus `json:"radioStatus" binding:"required"`
 	SystemStatus  SystemInfo   `json:"systemStatus" binding:"required"`
@@ -59,38 +72,32 @@ type MinerHeartbeatData struct {
 }
 
 type OtaFirmwareUpgradeData struct {
-	Release struct {
-		Distribution string `json:"distribution" binding:"required" v:"required"`
-		Version      string `json:"version" binding:"required" v:"required"`
-		Target       string `json:"target" binding:"required" v:"required"`
-		Description  string `json:"description" binding:"required" v:"required"`
-	} `json:"release"`
-	ImageUrl  string `json:"imageUrl" binding:"required" v:"required"`
-	Sha256    string `json:"sha256" binding:"required" v:"required"`
-	Model     string `json:"model" binding:"required" v:"required"`
-	BoardName string `json:"boardName" binding:"required" v:"required"`
-	ImageData []byte `json:"imageData" binding:"required" v:"required"`
+	Id           int    `json:"id" binding:"required" v:"required"`
+	Distribution string `json:"distribution" binding:"required" v:"required"`
+	Version      string `json:"version" binding:"required" v:"required"`
+	Target       string `json:"target" binding:"required" v:"required"`
+	Description  string `json:"description" binding:"required" v:"required"`
+	ImageUrl     string `json:"imageUrl" binding:"required" v:"required"`
+	IsForced     bool   `json:"isForced" binding:"required" v:"required"`
+	Sha256       string `json:"sha256" binding:"required" v:"required"`
+	Model        string `json:"model" binding:"required" v:"required"`
+	BoardName    string `json:"boardName" binding:"required" v:"required"`
 }
 
 type OtaFirmwareUpgradeReplyData struct {
-	Release struct {
-		Distribution string `json:"distribution" binding:"required" v:"required"`
-		Version      string `json:"version" binding:"required" v:"required"`
-		Target       string `json:"target" binding:"required" v:"required"`
-		Description  string `json:"description" binding:"required" v:"required"`
-	} `json:"release"`
-	Result string `json:"result" binding:"required" v:"required"`
+	UpgradeId int    `json:"upgradeId" binding:"required" v:"required"`
+	Message   string `json:"message" binding:"required" v:"required"`
+	Success   bool   `json:"success" binding:"required" v:"required"`
 }
 
 type OtaFirmwareCheckData struct {
-	Release struct {
-		Distribution string `json:"distribution" binding:"required" v:"required"`
-		Version      string `json:"version" binding:"required" v:"required"`
-		Target       string `json:"target" binding:"required" v:"required"`
-		Description  string `json:"description" binding:"required" v:"required"`
-	} `json:"release"`
-	Model     string `json:"model" binding:"required" v:"required"`
-	BoardName string `json:"boardName" binding:"required" v:"required"`
+	Distribution string `json:"distribution" binding:"required" v:"required"`
+	Version      string `json:"version" binding:"required" v:"required"`
+	Target       string `json:"target" binding:"required" v:"required"`
+	Description  string `json:"description" binding:"required" v:"required"`
+	Model        string `json:"model" binding:"required" v:"required"`
+	BoardName    string `json:"boardName" binding:"required" v:"required"`
+	Sn           string `json:"sn" binding:"required" v:"required"`
 }
 
 // =================================================================================
