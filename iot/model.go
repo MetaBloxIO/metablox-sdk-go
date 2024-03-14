@@ -65,6 +65,7 @@ type MinerHeartbeatData struct {
 	Sn            string       `json:"sn" binding:"required" v:"required"`
 	Did           string       `json:"did" binding:"required" v:"required"`
 	Mac           string       `json:"mac" binding:"required" v:"required"`
+	PublicIP      string       `json:"publicIP"`
 	WalletAddress string       `json:"walletAddress" `
 	RadioStatus   []WiFiStatus `json:"radioStatus" binding:"required"`
 	SystemStatus  SystemInfo   `json:"systemStatus" binding:"required"`
